@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Stormy</string>
+    <string name="error_title">sorry friend</string>
+    <string name="error_message">There was an error, please try again</string>
+    <string name="network_unavailible_message">Sorry network isn\'t availible</string>
+    <string name="dark_sky_message"><a href = "https://darksky.net/dev">Powered by DarkSky</a></string>
+</resources>
