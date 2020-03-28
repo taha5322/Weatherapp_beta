@@ -1,15 +1,21 @@
 package com.example.stormy;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
+import com.example.stormy.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -27,11 +33,27 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
     private CurrentWeather currentWeather;
     private TextView darkSkyAttribution;
+    private ImageView iconImageView;
+    final double latitude = 37.8267;
+    final double longitude = -122.4233;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+
+
+        getForecast(latitude,longitude);
+
+    }
+
+    private void getForecast(double latitude, double longitude) {
+        //setContentView(R.layout.activity_main);
+
+        //how to data bind to using an xml file. Second parameter is the xml file's id
+        final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        iconImageView = findViewById(R.id.iconImageView);
 
         //used to make the link work
         darkSkyAttribution = findViewById(R.id.darkSkyAttribution);
@@ -39,8 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         String link ="https://api.darksky.net/forecast/";
         String apiKey = "c043e98b63e555588028b88476bd1ef1";
-        double latitude= 37.8267;
-        double longitude = -122.4233;
+
 
         String URL = "https://api.darksky.net/forecast/c043e98b63e555588028b88476bd1ef1/37.8267,-122.4233";
 
@@ -77,6 +98,32 @@ public class MainActivity extends AppCompatActivity {
 
                         if (response.isSuccessful()) {//checks to see if we have response
                             currentWeather = getCurrentDetails(jsonData);
+
+                            final CurrentWeather displayWeather = new CurrentWeather(
+                                    currentWeather.getLocationLabel(),
+                                    currentWeather.getIcon(),
+                                    currentWeather.getTime(),
+                                    currentWeather.getTemperature(),
+                                    currentWeather.getHumidity(),
+                                    currentWeather.getPrecipChance(),
+                                    currentWeather.getSummary(),
+                                    currentWeather.getTimeZone()
+                            );
+                            //setWeather() sets the binding 'CurrentWeather' class for the XML viw
+                            binding.setWeather(displayWeather);
+
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//
+//                                }
+//                            });
+                            //if you get a thread exception, put bottom code in the run()
+                            Drawable drawable = getResources().getDrawable(currentWeather.getIconId());
+                            iconImageView.setImageDrawable(drawable);
+
+                            Log.v(TAG,"HIIIIIIIIIIII, Summary is: " + displayWeather.getSummary());
+
                         } else {
                             alertUserAboutProblem();
                         }
@@ -98,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
         } else{
             Toast.makeText(this, R.string.network_unavailible_message,Toast.LENGTH_LONG).show();
         }
-
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
@@ -119,8 +165,6 @@ public class MainActivity extends AppCompatActivity {
         currentWeather.setSummary(currentlyObject.getString("summary"));
         currentWeather.setTemperature(currentlyObject.getDouble("temperature"));
         currentWeather.setTimeZone(timezone);
-
-        Log.d(TAG, currentWeather.getFormatteeTime());
 
         return currentWeather;
     }
@@ -152,5 +196,10 @@ public class MainActivity extends AppCompatActivity {
 
         //shows the dialog on the activity. Fragment manager, u jus use getFragmentManager
         dialog.show(getFragmentManager(), "Error dialog");
+    }
+
+    public void refreshOnclick(View view) {
+        Toast.makeText(this,"Getting weather", Toast.LENGTH_LONG).show();
+        getForecast(latitude,longitude);
     }
 }
