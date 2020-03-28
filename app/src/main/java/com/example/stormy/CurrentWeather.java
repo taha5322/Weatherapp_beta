@@ -25,6 +25,22 @@ public class CurrentWeather {
         this.timeZone = timeZone;
     }
 
+    public CurrentWeather() {
+    }
+
+    public CurrentWeather(String locationLabel, String icon, long time,
+                          double temperature, double humidity, double precipChance,
+                          String summary, String timeZone) {
+        this.locationLabel = locationLabel;
+        this.icon = icon;
+        this.time = time;
+        this.temperature = Math.round(temperature);
+        this.humidity = humidity;
+        this.precipChance = precipChance;
+        this.summary = summary;
+        this.timeZone = timeZone;
+    }
+
     public int getIconId(){
         int iconId=0;
         switch(icon) {
