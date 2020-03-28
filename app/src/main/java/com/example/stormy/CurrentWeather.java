@@ -1,6 +1,7 @@
 package com.example.stormy;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -84,7 +85,33 @@ public class CurrentWeather {
         //in miliseconds. The JSON gives us UNIX time in seconds
         //I multiplied by thousand and made a date object which is what
         //the format() needs as an object to return the time while formatted.
-        return format.format(dateTime);
+
+        //String wrongTime = format.format(dateTime);
+
+//        StringBuffer buffer = new StringBuffer(wrongTime);
+//
+//        char firstDidget = wrongTime.charAt(0);
+//        char secondDidget = wrongTime.charAt(1);
+//        int i;
+//        for( i=2; i<8; i++){
+//            if( ((int) firstDidget) == i ){
+//                buffer.replace(0,1,Integer.toString(i+2));
+//            }
+//        }
+//        if((int)firstDidget==1 && secondDidget == ':'){
+//            buffer.replace(0,1, Integer.toString( (int)firstDidget +2) );
+//        } else if((int)firstDidget==1 && (int)secondDidget==1){
+//            buffer.replace(0,2,"1");
+//        } else if((int)firstDidget==1 && (int)secondDidget==2){
+//            buffer.replace(0,2,"2");
+//        }
+//        return buffer.toString();
+        Calendar cal;
+        cal = Calendar.getInstance();
+        cal.add(Calendar.HOUR, 2);
+        String correctTime = format.format(cal.getTime());
+//        return Integer.toString(firstDidget);
+        return correctTime;
     }
 
     public String getLocationLabel() {
