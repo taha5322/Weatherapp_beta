@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         String apiKey = "c043e98b63e555588028b88476bd1ef1";
 
 
-        String URL = "https://api.darksky.net/forecast/c043e98b63e555588028b88476bd1ef1/37.8267,-122.4233";
+        String URL = "https://api.darksky.net/forecast/c043e98b63e555588028b88476bd1ef1/43.6532,79.3832";
 
         if(isNetworkAvailible()) {
 
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                             Drawable drawable = getResources().getDrawable(currentWeather.getIconId());
                             iconImageView.setImageDrawable(drawable);
 
-                            Log.v(TAG,"HIIIIIIIIIIII, Summary is: " + displayWeather.getSummary());
+                            Log.v(TAG,"time is: " + currentWeather.getFormatteeTime());
 
                         } else {
                             alertUserAboutProblem();
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         currentWeather.setLocationLabel("Alcatraz Island");
         currentWeather.setPrecipChance(currentlyObject.getDouble("precipProbability"));
         currentWeather.setSummary(currentlyObject.getString("summary"));
-        currentWeather.setTemperature(currentlyObject.getDouble("temperature"));
+        currentWeather.setTemperature(currentlyObject.getDouble("apparentTemperature"));
         currentWeather.setTimeZone(timezone);
 
         return currentWeather;
