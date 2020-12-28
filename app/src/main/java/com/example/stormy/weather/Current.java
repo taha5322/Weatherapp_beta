@@ -1,4 +1,6 @@
-package com.example.stormy;
+package com.example.stormy.weather;
+
+import com.example.stormy.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -7,7 +9,7 @@ import java.util.TimeZone;
 
 // Created by Taha Siddiqui
 // 2020-03-27
-public class CurrentWeather {
+public class Current {
     private String locationLabel;
     private String icon;
     private long time;
@@ -26,12 +28,12 @@ public class CurrentWeather {
         this.timeZone = timeZone;
     }
 
-    public CurrentWeather() {
+    public Current() {
     }
 
-    public CurrentWeather(String locationLabel, String icon, long time,
-                          double temperature, double humidity, double precipChance,
-                          String summary, String timeZone) {
+    public Current(String locationLabel, String icon, long time,
+                   double temperature, double humidity, double precipChance,
+                   String summary, String timeZone) {
         this.locationLabel = locationLabel;
         this.icon = icon;
         this.time = time;
@@ -43,35 +45,8 @@ public class CurrentWeather {
     }
 
     public int getIconId(){
-        int iconId=0;
-        switch(icon) {
-
-            case "rain":
-                iconId = R.drawable.rain;
-                break;
-            case "snow":
-                iconId = R.drawable.snow;
-                break;
-            case "sleet":
-                iconId = R.drawable.sleet;
-                break;
-            case "wind":
-                iconId = R.drawable.wind;
-                break;
-            case "fog":
-                iconId = R.drawable.fog;
-                break;
-            case "cloudy":
-                iconId = R.drawable.cloudy;
-                break;
-            case "partly-cloudy-day":
-                iconId = R.drawable.partly_cloudy;
-                break;
-            case "partly-cloudy-night":
-                iconId = R.drawable.cloudy_night;
-                break;
-        }
-        return iconId;
+        int iconId = R.drawable.sunny;
+        return Forecast.getIconId(icon);
     }
 
     public String getFormatteeTime(){

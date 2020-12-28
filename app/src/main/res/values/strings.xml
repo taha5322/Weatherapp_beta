@@ -3,5 +3,14 @@
     <string name="error_title">sorry friend</string>
     <string name="error_message">There was an error, please try again</string>
     <string name="network_unavailible_message">Sorry network isn\'t availible</string>
-    <string name="dark_sky_message"><a href = "https://darksky.net/dev">Powered by DarkSky</a></string>
+    <string name="dark_sky_message"><a href="https://darksky.net/dev">Powered by DarkSky</a></string>
+    <string name="title_activity_hourly_forecast">HourlyForecastActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

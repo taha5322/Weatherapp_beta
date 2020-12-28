@@ -1,6 +1,7 @@
-package com.example.stormy;
+package com.example.stormy.UI;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,13 +16,21 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.example.stormy.R;
 import com.example.stormy.databinding.ActivityMainBinding;
+import com.example.stormy.weather.Current;
+import com.example.stormy.weather.Forecast;
+import com.example.stormy.weather.Hour;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -31,7 +40,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
-    private CurrentWeather currentWeather;
+    private Forecast forecast;
     private TextView darkSkyAttribution;
     private ImageView iconImageView;
     final double latitude = 37.8267;
@@ -97,32 +106,36 @@ public class MainActivity extends AppCompatActivity {
                         //from the response.
 
                         if (response.isSuccessful()) {//checks to see if we have response
-                            currentWeather = getCurrentDetails(jsonData);
+                            forecast = parseForecastData(jsonData);
+//                            Hour[] hours = forecast.getHourlyForecast();jj
+                            Current current = forecast.getCurrent();
 
-                            final CurrentWeather displayWeather = new CurrentWeather(
-                                    currentWeather.getLocationLabel(),
-                                    currentWeather.getIcon(),
-                                    currentWeather.getTime(),
-                                    currentWeather.getTemperature(),
-                                    currentWeather.getHumidity(),
-                                    currentWeather.getPrecipChance(),
-                                    currentWeather.getSummary(),
-                                    currentWeather.getTimeZone()
+                            final Current displayWeather = new Current(
+                                    current.getLocationLabel(),
+                                    current.getIcon(),
+                                    current.getTime(),
+                                    current.getTemperature(),
+                                    current.getHumidity(),
+                                    current.getPrecipChance(),
+                                    current.getSummary(),
+                                    current.getTimeZone()
                             );
+                            Log.v(TAG, current.getIcon());
+
                             //setWeather() sets the binding 'CurrentWeather' class for the XML viw
                             binding.setWeather(displayWeather);
 
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//
-//                                }
-//                            });
-                            //if you get a thread exception, put bottom code in the run()
-                            Drawable drawable = getResources().getDrawable(currentWeather.getIconId());
-                            iconImageView.setImageDrawable(drawable);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //if you get a thread exception, put bottom code in the run()
+                                    final Drawable drawable = getResources().getDrawable(displayWeather.getIconId());
+                                    iconImageView.setImageDrawable(drawable);
+                                }
+                            });
 
-                            Log.v(TAG,"time is: " + currentWeather.getFormatteeTime());
+
+                            Log.v(TAG,"time is: " + current.getFormatteeTime());
 
                         } else {
                             alertUserAboutProblem();
@@ -147,7 +160,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
+    private Forecast parseForecastData(String jsonData) throws JSONException {
+        Forecast forecast2 = new Forecast();
+
+        forecast2.setCurrent(getCurrentDetails(jsonData));
+        forecast2.setHourlyForecast(getHourlyForecast(jsonData));
+        return forecast2;
+    }
+
+    private Hour[] getHourlyForecast(String jsonData) throws JSONException {
+        JSONObject forecast = new JSONObject(jsonData);
+        String timezone = forecast.getString("timezone");
+
+        JSONObject hourly = forecast.getJSONObject("hourly");
+        JSONArray data = hourly.getJSONArray("data");
+
+        Hour[] hours = new Hour[data.length()];
+
+        for(int i=0; i<data.length(); i++){
+            JSONObject jsonHour = data.getJSONObject(i);
+            Hour hour = new Hour();
+
+            hour.setTime( jsonHour.getLong("time") );
+            hour.setIcon(jsonHour.getString("icon"));
+            hour.setSummary(jsonHour.getString("summary"));
+            hour.setTemperature(jsonHour.getDouble("temperature"));
+            hour.setTimeZone(timezone);
+            hours[i] = hour;
+        }
+
+        return  hours;
+    }
+
+    private Current getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
         String timezone = forecast.getString("timezone");
         Log.i(TAG,"From JSON: " + timezone);
@@ -155,18 +200,18 @@ public class MainActivity extends AppCompatActivity {
         //object inside the json file which has data we care about
         JSONObject currentlyObject = forecast.getJSONObject("currently");
 
-        CurrentWeather currentWeather = new CurrentWeather();
+        Current current = new Current();
 
-        currentWeather.setHumidity(currentlyObject.getDouble("humidity"));
-        currentWeather.setTime(currentlyObject.getLong("time"));
-        currentWeather.setIcon(currentlyObject.getString("icon"));
-        currentWeather.setLocationLabel("Alcatraz Island");
-        currentWeather.setPrecipChance(currentlyObject.getDouble("precipProbability"));
-        currentWeather.setSummary(currentlyObject.getString("summary"));
-        currentWeather.setTemperature(currentlyObject.getDouble("apparentTemperature"));
-        currentWeather.setTimeZone(timezone);
+        current.setHumidity(currentlyObject.getDouble("humidity"));
+        current.setTime(currentlyObject.getLong("time"));
+        current.setIcon(currentlyObject.getString("icon"));
+        current.setLocationLabel("Alcatraz Island");
+        current.setPrecipChance(currentlyObject.getDouble("precipProbability"));
+        current.setSummary(currentlyObject.getString("summary"));
+        current.setTemperature(currentlyObject.getDouble("apparentTemperature"));
+        current.setTimeZone(timezone);
 
-        return currentWeather;
+        return current;
     }
 
 
@@ -201,5 +246,16 @@ public class MainActivity extends AppCompatActivity {
     public void refreshOnclick(View view) {
         Toast.makeText(this,"Getting weather", Toast.LENGTH_LONG).show();
         getForecast(latitude,longitude);
+    }
+
+    //method setup in the onClick property in activtiy main xml for the hourly
+    //forecast button
+    public void hourlyOnclick(View view){
+        Hour[] hours2 = forecast.getHourlyForecast();
+//        Hour hour1 = hours2[1];
+         List<Hour> hours = Arrays.asList(hours2);
+        Intent intent = new Intent(this, HourlyForecastActivity.class);
+        intent.putExtra("HourlyList", (Serializable) hours);
+        startActivity(intent);
     }
 }
